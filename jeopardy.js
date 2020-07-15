@@ -26,8 +26,30 @@ let categories = [];
  * Returns array of category ids
  */
 
-function getCategoryIds() {
-
+function getCategoryIds(api) {
+    // console.log(api)
+    catNum = []
+    catId = []
+    apiId = []
+    for(let i=0; i<100; i++){
+        catNum.push(i)
+    }
+    for(let i=0; i<5; i++){
+        id = Math.floor(Math.random()*100)
+        catId.push(id)
+        catNum.splice(id,1)
+        // console.log(catId)
+        // console.log(catNum.length)
+    }
+    if(catNum.length !== 95){
+        console.log('inside the duplicate return')
+        setupAndStart()
+    }else{
+        for(x of catId){
+            apiId.push(api.data[x].id)
+        }
+    }
+    return apiId
 }
 
 /** Return object with data about a category:
@@ -43,6 +65,20 @@ function getCategoryIds() {
  */
 
 function getCategory(catId) {
+    console.log(catId)
+    let clueArray = [];
+    for(let i=0; i<=catId.length; i++){
+        console.log('inside the for loop')
+        for(let j=0; j<5; j++){
+            console.log(catId[i].data.clues[j].question)
+            console.log(catId[i].data.clues[j].answer)
+            
+        }
+        
+    // console.log(catId[i].data.clues[i].answer)
+    // console.log(catId[i].data.clues[i].showing)
+    }
+
 }
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
@@ -91,11 +127,19 @@ function hideLoadingView() {
  * */
 
 $('#start').on('click', async function setupAndStart(e) {
-    const jeopordy = await axios.get('http://api/jservice.io/categories/')
-    console.log(jeopordy)   
+    const jeopardy = await axios.get('http://jservice.io/api/categories', {params: {count:100}})
+    // const clues = await axios.get('http://jservice.io/api/categories/')
+    // console.log(jeopordy.data[0].id)  
+    const apiId = getCategoryIds(jeopardy)
+    console.log(apiId)
+    for(ids of apiId){
+            let category = await axios.get('http://jservice.io/api/category', {params: {id:`${ids}`}})
+            categories.push(category)
+            console.log(categories)
+    }
+    category = getCategory(categories)
+    
 })
-
-
 
 
 /** On click of start / restart button, set up game. */
